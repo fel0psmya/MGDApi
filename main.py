@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,  HTTPException
 from collections import OrderedDict
 from pydantic import BaseModel
 from typing import List
@@ -365,3 +365,16 @@ def get_game_by_id(game_id):
             # Converte o jogo encontrado em dicionário
             return OrderedDict(game.model_dump())
     return None  # Retorna None caso o jogo não exista
+
+@app.get("/games", response_model=List[Game])
+def read_games():
+    games = get_all_games()
+    return games
+
+@app.get("/games/{game_id}", response_model=Game)
+def read_game(game_id: int):
+    game = get_game_by_id(game_id)
+    if game:
+        return game
+    else:
+        raise HTTPException(status_code=404, detail="Jogo não encontrado")
